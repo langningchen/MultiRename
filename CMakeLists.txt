@@ -4,7 +4,7 @@ project(MultiRename)
 set(CMAKE_CXX_COMPILER "g++")
 set(CMAKE_CXX_STANDARD 17)
 
-add_executable(main
+add_executable(MultiRename
     main.cpp
 )
 
@@ -12,4 +12,4 @@ set(LIBS
     Rpcrt4
 )
 
-target_link_libraries(main PRIVATE ${LIBS})
+target_link_libraries(MultiRename PRIVATE ${LIBS})

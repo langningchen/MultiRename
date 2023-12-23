@@ -11,7 +11,7 @@ Rename multiple files on Windows with a pattern.
 1. Clone this repository
 2. Make sure you have `gcc` and `cmake` installed.
 3. Run `cmake -B build` and `cmake --build build` to build the project.
-4. Run `build\main.exe` to rename files.
+4. Run `build\MultiRename.exe` to rename files.
 
 ## Notes
 
