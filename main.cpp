@@ -1,6 +1,7 @@
 #include <windows.h>
 #include <iostream>
 #include <filesystem>
+#include <sstream>
 #include <vector>
 #include <string>
 #include <set>
