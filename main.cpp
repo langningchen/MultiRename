@@ -365,17 +365,17 @@ std::string ProceedRename(const FILE_INFO &File)
                             int a = std::stoi(Addison) - 1;
                             int b = std::stoi(Addison.substr(Addison.find('~') + 1)) - 1;
                             if (a < 0)
-                                a = Value.length() + a + 1;
+                                a = (int)Value.length() + a + 1;
                             else if (a == 0)
                                 a = 1;
                             else if (a > (int)Value.length())
-                                a = Value.length();
+                                a = (int)Value.length();
                             if (b < 0)
-                                b = Value.length() + b + 1;
+                                b = (int)Value.length() + b + 1;
                             else if (b == 0)
                                 b = 1;
                             else if (b > (int)Value.length())
-                                b = Value.length();
+                                b = (int)Value.length();
                             if (a > b)
                                 std::swap(a, b);
                             Value = Value.substr(a, b - a + 1);
