@@ -41,8 +41,7 @@ bool operator==(FILE_INFO a, FILE_INFO b)
 }
 
 std::string CurrentDir = "C:";
-size_t CurrentCursor;
-std::string Pattern = "[N]";
+std::string Pattern = "[F]";
 std::vector<FILE_INFO> FilesToRename;
 std::vector<std::pair<int, std::pair<int, int>>> Indexes;
 
@@ -137,6 +136,7 @@ std::vector<FILE_INFO> GetFilesInDirectory(const std::string &Directory)
 }
 void SelectFiles()
 {
+    size_t CurrentCursor = 0;
     while (true)
     {
         std::vector<DIRECTORY_INFO> Directories = GetDirectoriesInDirectory(CurrentDir);
@@ -157,8 +157,8 @@ void SelectFiles()
                 std::cout << "\033[32m";
             std::cout << File.FullName << "\033[0m" << std::endl;
         }
-        char Input = _getch();
-        if (Input == 0)
+        int Input = _getch();
+        if (Input == 0 || Input == 224)
         {
             Input = _getch();
             if (Input == 72 && CurrentCursor > 0)
@@ -228,7 +228,7 @@ void SelectFiles()
 }
 void SortFiles()
 {
-    CurrentCursor = 0;
+    size_t CurrentCursor = 0;
     bool SortMode = false;
 
     printf("\033[H\033[J\033[33mSort files: \033[0m\n");
@@ -242,8 +242,8 @@ void SortFiles()
 
     while (true)
     {
-        char Input = _getch();
-        if (Input == 0)
+        int Input = _getch();
+        if (Input == 0 || Input == 224)
         {
             Input = _getch();
             if (Input == 72 && CurrentCursor > 0)
@@ -260,9 +260,9 @@ void SortFiles()
             }
         }
         else if (Input == 13)
-            SortMode = !SortMode;
-        else if (Input == 27)
             break;
+        else if (Input == 32)
+            SortMode = !SortMode;
         if (CurrentCursor > 0)
             std::cout << "\033[" << CurrentCursor + 1 << ";1H\033[K" << FilesToRename[CurrentCursor - 1].FullPath << "\033[0m\n";
         std::cout << "\033[" << CurrentCursor + 2 << ";1H\033[K\033[7m" << (SortMode ? "\033[32m" : "") << FilesToRename[CurrentCursor].FullPath << "\033[0m\n";
@@ -270,7 +270,7 @@ void SortFiles()
             std::cout << "\033[" << CurrentCursor + 3 << ";1H\033[K" << FilesToRename[CurrentCursor + 1].FullPath << "\033[0m\n";
     }
 }
-std::string ProceedRename(const FILE_INFO &FindData)
+std::string ProceedRename(const FILE_INFO &File)
 {
     size_t IndexCount = 0;
     std::string NewName = Pattern;
@@ -287,28 +287,28 @@ std::string ProceedRename(const FILE_INFO &FindData)
             try
             {
                 if (Command == "F")
-                    Value = FindData.FullName;
+                    Value = File.FullName;
                 else if (Command == ".")
-                    Value = FindData.Extension == "" ? "" : ".";
+                    Value = File.Extension == "" ? "" : ".";
                 else if (Command == "E")
-                    Value = FindData.Extension;
+                    Value = File.Extension;
                 else if (Command == "N")
-                    Value = FindData.Name;
+                    Value = File.Name;
                 else if (Command == "D")
-                    Value = FindData.Directory;
+                    Value = File.Directory;
                 else if (Command == "S")
-                    Value = std::to_string(FindData.Size);
+                    Value = std::to_string(File.Size);
                 else if (Command == "T" || Command == "C" || Command == "W" || Command == "A")
                 {
                     SYSTEMTIME SystemTime;
                     if (Command == "T")
                         GetLocalTime(&SystemTime);
                     else if (Command == "C")
-                        SystemTime = FindData.CreationTime;
+                        SystemTime = File.CreationTime;
                     else if (Command == "W")
-                        SystemTime = FindData.LastWriteTime;
+                        SystemTime = File.LastWriteTime;
                     else if (Command == "A")
-                        SystemTime = FindData.LastAccessTime;
+                        SystemTime = File.LastAccessTime;
                     char Buffer[256];
                     GetDateFormat(LOCALE_USER_DEFAULT, 0, &SystemTime, "yyyy-MM-dd", Buffer, 256);
                     Value = Buffer;
@@ -355,13 +355,13 @@ std::string ProceedRename(const FILE_INFO &FindData)
                         if (Command == "N" || Command == "F" || Command == "E" || Command == "D")
                         {
                             if (Command == "N")
-                                Value = FindData.Name;
+                                Value = File.Name;
                             else if (Command == "F")
-                                Value = FindData.FullName;
+                                Value = File.FullName;
                             else if (Command == "E")
-                                Value = FindData.Extension;
+                                Value = File.Extension;
                             else if (Command == "D")
-                                Value = FindData.Directory;
+                                Value = File.Directory;
                             int a = std::stoi(Addison) - 1;
                             int b = std::stoi(Addison.substr(Addison.find('~') + 1)) - 1;
                             if (a < 0)
@@ -386,11 +386,11 @@ std::string ProceedRename(const FILE_INFO &FindData)
                             if (Command == "T")
                                 GetLocalTime(&SystemTime);
                             else if (Command == "C")
-                                SystemTime = FindData.CreationTime;
+                                SystemTime = File.CreationTime;
                             else if (Command == "W")
-                                SystemTime = FindData.LastWriteTime;
+                                SystemTime = File.LastWriteTime;
                             else if (Command == "A")
-                                SystemTime = FindData.LastAccessTime;
+                                SystemTime = File.LastAccessTime;
                             char Buffer[256];
                             GetDateFormat(LOCALE_USER_DEFAULT, 0, &SystemTime, Addison.c_str(), Buffer, 256);
                             Value = Buffer;
@@ -435,7 +435,7 @@ std::string ProceedRename(const FILE_INFO &FindData)
     }
     if (NewName.length() > 32)
         NewName = "Name too long";
-    return NewName;
+    return File.Directory + "/" + NewName;
 }
 void Rename()
 {
@@ -446,8 +446,8 @@ void Rename()
         for (const auto &File : FilesToRename)
             printf("\033[31m%s\033[0m -> \033[32m%s\033[0m\n", File.FullPath.c_str(), ProceedRename(File).c_str());
         printf("\n\033[33mRandom items may have different values than the displayed ones.\nPress Enter to confirm and ESC to cancel.\033[0m\n\n");
-        char Input = _getch();
-        if (Input == 0)
+        int Input = _getch();
+        if (Input == 0 || Input == 224)
             _getch();
         else if (Input == 13)
         {
