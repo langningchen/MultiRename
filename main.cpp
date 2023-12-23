@@ -269,27 +269,6 @@ void SortFiles()
             std::cout << "\033[" << CurrentCursor + 3 << ";1H\033[K" << FilesToRename[CurrentCursor + 1].FullPath << "\033[0m\n";
     }
 }
-/**
- * @brief Proceed rename file name operation
- * @details Rename rules:
- *          `[F]`: Full file name (e.g. "file.txt")
- *          `[.]`: File extension dot (if file has extension, then "."; otherwise, "")
- *          `[E]`: File extension (e.g. "txt")
- *          `[N]`: File name, same as "[F][.][E]" (e.g. "file")
- *          `[D]`: File directory (e.g. "Folder")
- *          `[N:a~b]` `[F:a~b]` `[E:a~b]` `[D:a~b]` `[P:a~b]`: File name from a to b, if a or b is less than 0, then count from the end of the string (e.g. [N1~3]="fil"   [N1~-2]="fi"   [N-3~-1]="ile")
- *          `[S]`: File size in bytes (e.g. "1024")
- *          `[T]` `[C]` `[W]` `[A]`: Current time or file last create/write/access time (e.g. "2019-01-01 00:00:00")
- *          `[T]` `[C:format]` `[W:format]` `[A:format]`: Current time or file last create/write/access time with format, format is the same as strftime (e.g. "2019-01-01 00:00:00")
- *          `[[]`: Character '['
- *          `[]]`: Character ']'
- *          `[U]`: Random UUID (e.g. "123e4567-e89b-12d3-a456-426655440000")
- *          `[I]`: File index
- *          `[I:Start,Step,Digits]`: File index
- *
- * @param FindData
- * @return std::string
- */
 std::string ProceedRename(const FILE_INFO &FindData)
 {
     size_t IndexCount = 0;
