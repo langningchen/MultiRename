@@ -41,7 +41,7 @@ bool operator==(FILE_INFO a, FILE_INFO b)
 }
 
 std::string CurrentDir = "C:";
-std::string Pattern = "[F]";
+std::string Pattern = "[D]/[F]";
 std::vector<FILE_INFO> FilesToRename;
 std::vector<std::pair<int, std::pair<int, int>>> Indexes;
 
@@ -433,9 +433,7 @@ std::string ProceedRename(const FILE_INFO &File)
         else
             Position++;
     }
-    if (NewName.length() > 32)
-        NewName = "Name too long";
-    return File.Directory + "/" + NewName;
+    return NewName;
 }
 void Rename()
 {
